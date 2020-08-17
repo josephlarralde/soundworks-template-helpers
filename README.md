@@ -1,56 +1,56 @@
-# `simple-components`
+# `soundworks-template-helpers`
 
-> set of web components for audio interfaces and rapid prototyping, created using the [lit-element](https://lit-element.polymer-project.org/) library.
+> Set of common helpers for applications based on the [`soundworks-template`](https://github.com/collective-soundworks/soundworks-template)
 
-## Documentation
+## `renderInitializationScreens()`
 
-[http://ircam-ismm.github.io/simple-components/](http://ircam-ismm.github.io/simple-components/)
+Display generic initialization screens for plugins
 
-## Installation
+### Usage
 
-```sh
-npm install @ircam/simple-components --save
+```
+import { Experience } from '@soundworks/core/client';
+import { render, html } from 'lit-html';
+import renderInitializationScreens from '@soundworks/template-helpers/client/render-initialization-screens.js';
+
+class ControllerExperience extends Experience {
+  constructor(client, config, $container) {
+    super(client);
+
+    this.config = config;
+    this.$container = $container;
+
+    renderInitializationScreens(client, config, $container);
+  }
+
+  // ...
+}
 ```
 
-## Usage
+## `initQoS`
 
-@todo
+Initialize generic quality of service strategies.
 
-## Design Consideration
-  
-These design aspects aim at simplifying future wrapping of the components in an editing tool.
+For now, reload application when socket close or on visibility change.
+__These strategies will be refined / completed over time.__
 
-### Attributes
+### Usage
 
-All components must expose a `width` and `height` attribute, for squared components (e.g. `<sc-bang>` and `<sc-toggle>`) the last attribute set wins
+```
+import { Client } from '@soundworks/core/client';
+import initQoS from '@soundworks/helpers/client/init-qos.js';
 
-### Events
+async function launch() {
+  try {
+    const client = new Client();
+    await client.init(window.soundworksConfig);
+    initQoS(client);
 
-- all components should at least expose an `@input` or a `@change` event. 
-- they can expose additional events, e.g. button `@press` and `@release`
-- payload should always have `e.details.value`
+    // ...
+  } catch(err) {
+    console.error(err);
+  }
+}
 
-## Notes
-
-## Existing components
-
-see. documentation ([http://ircam-ismm.github.io/simple-components/](http://ircam-ismm.github.io/simple-components/))
-
-## @todos
-
-- `<sc-range>`
-- `<sc-multislider>`
-- `<sc-matrix>`
-- `<sc-volume>` (slider and number w/ db and lin output)
-- `<sc-pan>`
-- `<sc-select>`
-- `<sc-radio>`
-- `<sc-dial>` (maybe we just have to accept some people like that sort of thing...)
-
-### theming
-  + https://developer.mozilla.org/en-US/docs/Web/CSS/Using_CSS_custom_properties
-  + https://lit-element.polymer-project.org/guide/styles#example-theme
-
-## License
-
-BSD-3-Clause
+launch();
+```

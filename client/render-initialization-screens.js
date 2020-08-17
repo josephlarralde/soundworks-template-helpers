@@ -160,7 +160,7 @@ const renderScreen = {
  * This method only works with default service names (cf. `serviceFactory.defaultName`).
  * if other names are used, should be updated accordingly...
  */
-export default function renderInitialization(client, config, $container) {
+export default function renderInitializationScreens(client, config, $container) {
   const unsubscribe = client.serviceManager.observe(status => {
     const { width, height } = $container.getBoundingClientRect();
 
