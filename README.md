@@ -2,7 +2,7 @@
 
 > Set of common helpers for applications based on the [`soundworks-template`](https://github.com/collective-soundworks/soundworks-template)
 
-## `renderInitializationScreens()`
+## `renderInitializationScreens`
 
 Display generic initialization screens for plugins
 
@@ -54,3 +54,7 @@ async function launch() {
 
 launch();
 ```
+
+## License
+
+BSD-3-Clause
