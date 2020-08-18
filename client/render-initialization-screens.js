@@ -68,8 +68,6 @@ const errorMsg = {
   },
 };
 
-
-// this one is very special
 const renderScreen = {
   platform(platform, config, containerInfos) {
     const pluginState = platform.state.getValues();
@@ -82,7 +80,7 @@ const renderScreen = {
       msg = 'Checkin...';
     } else if (pluginState.authorized === null) {
       msg = 'Authorizing...';
-    } else if (pluginState.initialized === null) {
+    } else if (pluginState.initializing === null) {
       msg = 'Please click to join';
       blink = true;
 
@@ -90,6 +88,8 @@ const renderScreen = {
         e.preventDefault();
         platform.onUserGesture(e);
       }
+    } else if (pluginState.initialized === null) {
+      msg = 'Initializing...'
     } else if (pluginState.finalized === null) {
       msg = 'Finalizing...'
     }
