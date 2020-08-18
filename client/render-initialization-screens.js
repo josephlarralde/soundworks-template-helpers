@@ -7,14 +7,14 @@ import './components/sw-plugin-default.js';
 import './components/sw-plugin-error.js';
 
 const startedMsg = {
-  'audio-buffer-loader': (service) => 'Loading audio files',
-  'sync': (service) => 'Syncing',
-  'default': (service) => `Initializing ${service.name}`,
+  'audio-buffer-loader': (plugin) => 'Loading audio files',
+  'sync': (plugin) => 'Syncing',
+  'default': (plugin) => `Initializing ${plugin.name}`,
 };
 
 const errorMsg = {
-  platform(service) {
-    const serviceState = service.state.getValues();
+  platform(plugin) {
+    const pluginState = plugin.state.getValues();
 
     const stepErrors = {
       available: 'checking device compatibility',
@@ -24,19 +24,19 @@ const errorMsg = {
     };
 
     // for testing...
-    // serviceState['finalized'].result = false;
-    // serviceState['finalized'].details['web-audio'] = false;
+    // pluginState['finalized'].result = false;
+    // pluginState['finalized'].details['web-audio'] = false;
 
     let errorMsg;
     let erroredFeatures = [];
 
     // set error message and find more informations in [step].details
     for (let step of Object.keys(stepErrors)) {
-      if (serviceState[step].result === false) { // this is the guilty one
+      if (pluginState[step].result === false) { // this is the guilty one
         errorMsg = stepErrors[step];
 
-        for (let feature in serviceState[step].details) {
-          if (serviceState[step].details[feature] === false) {
+        for (let feature in pluginState[step].details) {
+          if (pluginState[step].details[feature] === false) {
             erroredFeatures.push(feature);
           }
         }
@@ -60,10 +60,10 @@ const errorMsg = {
     return $html;
   },
 
-  default(service) {
+  default(plugin) {
     return html`
       <li slot="message">An error occured while...</li>
-      <li slot="description">Initializing ${service.name}</li>
+      <li slot="description">Initializing ${plugin.name}</li>
     `;
   },
 };
@@ -72,17 +72,17 @@ const errorMsg = {
 // this one is very special
 const renderScreen = {
   platform(platform, config, containerInfos) {
-    const serviceState = platform.state.getValues();
+    const pluginState = platform.state.getValues();
 
     let msg;
     let bindListener = undefined;
     let blink = false;
 
-    if (serviceState.available === null) {
+    if (pluginState.available === null) {
       msg = 'Checkin...';
-    } else if (serviceState.authorized === null) {
+    } else if (pluginState.authorized === null) {
       msg = 'Authorizing...';
-    } else if (serviceState.initialized === null) {
+    } else if (pluginState.initialized === null) {
       msg = 'Please click to join';
       blink = true;
 
@@ -90,7 +90,7 @@ const renderScreen = {
         e.preventDefault();
         platform.onUserGesture(e);
       }
-    } else if (serviceState.finalized === null) {
+    } else if (pluginState.finalized === null) {
       msg = 'Finalizing...'
     }
 
@@ -116,7 +116,7 @@ const renderScreen = {
 
     return html`
       <div class="screen">
-        <sw-service-position
+        <sw-plugin-position
           x-range="${JSON.stringify(xRange)}"
           y-range="${JSON.stringify(yRange)}"
           @change="${callback}"
@@ -127,41 +127,41 @@ const renderScreen = {
     `;
   },
 
-  default(services, config, containerInfos) {
+  default(plugins, config, containerInfos) {
     return html`
       <sw-plugin-default
         title="${config.app.name}"
         subtitle="${config.app.author}"
       >
-        ${services.map(service => html`
+        ${plugins.map(plugin => html`
           <li>
-            ${startedMsg[service.name]
-              ? startedMsg[service.name](service)
-              : startedMsg.default(service)}
+            ${startedMsg[plugin.name]
+              ? startedMsg[plugin.name](plugin)
+              : startedMsg.default(plugin)}
           </li>`
         )}
       </sw-plugin-default>
     `;
   },
 
-  errored(service, config, containerInfos) {
+  errored(plugin, config, containerInfos) {
     return html`
       <sw-plugin-error
         title="${config.app.name}"
         subtitle="${config.app.author}"
       >
-        ${errorMsg[service.name] ? errorMsg[service.name](service) : errorMsg.default(service)}
+        ${errorMsg[plugin.name] ? errorMsg[plugin.name](plugin) : errorMsg.default(plugin)}
       </sw-plugin-error>
     `;
   },
 };
 
 /**
- * This method only works with default service names (cf. `serviceFactory.defaultName`).
+ * This method only works with default plugin names (cf. `pluginFactory.defaultName`).
  * if other names are used, should be updated accordingly...
  */
 export default function renderInitializationScreens(client, config, $container) {
-  const unsubscribe = client.serviceManager.observe(status => {
+  const unsubscribe = client.pluginManager.observe(status => {
     const { width, height } = $container.getBoundingClientRect();
 
     // for testing...
@@ -173,33 +173,33 @@ export default function renderInitializationScreens(client, config, $container) 
     // handle platform first
     if (status['platform'] && status['platform'] === 'started') {
 
-      const platformService = client.serviceManager.get('platform');
+      const platformService = client.pluginManager.get('platform');
       $screen = renderScreen.platform(platformService, config, { width, height });
 
     } else if (status['platform'] && status['platform'] === 'errored') {
 
-      const platformService = client.serviceManager.get('platform');
+      const platformService = client.pluginManager.get('platform');
       $screen = renderScreen.errored(platformService, config, { width, height });
 
     // then every one else...
     } else if (status['position'] && status['position'] === 'started') {
 
-      const positionService = client.serviceManager.get('position');
+      const positionService = client.pluginManager.get('position');
       $screen = renderScreen.position(positionService, config, { width, height });
 
     } else {
       // platform is ready, or not platform at all...
       const started = [];
-      let errored = null; // only one service can be errored at once (normally)
+      let errored = null; // only one plugin can be errored at once (normally)
 
       for (let key in status) {
-        const service = client.serviceManager.get(key);
+        const plugin = client.pluginManager.get(key);
 
-        // we ignore ready and idle services
+        // we ignore ready and idle plugins
         if (status[key] === 'started') {
-          started.push(service);
+          started.push(plugin);
         } else if (status[key] === 'errored') {
-          errored = service;
+          errored = plugin;
         }
       }
 
@@ -214,6 +214,6 @@ export default function renderInitializationScreens(client, config, $container) 
   });
 
   // clean when ready...
-  client.serviceManager.ready.then(unsubscribe);
+  client.pluginManager.ready.then(unsubscribe);
 }
 
