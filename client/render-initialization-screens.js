@@ -107,7 +107,7 @@ const renderScreen = {
   },
 
   position(position, config, containerInfos) {
-    const { xRange, yRange } = position.options;
+    const { xRange, yRange, backgroundImage } = position.options;
 
     const callback = (e) => {
       const { x, y } = e.detail;
@@ -122,6 +122,7 @@ const renderScreen = {
           @change="${callback}"
           width="${containerInfos.width}"
           height="${containerInfos.height}"
+          background-image="${backgroundImage}"
         />
       </div>
     `;
@@ -161,7 +162,14 @@ const renderScreen = {
  * if other names are used, should be updated accordingly...
  */
 export default function renderInitializationScreens(client, config, $container) {
+  let currentStatus;
+
   const unsubscribe = client.pluginManager.observe(status => {
+    currentStatus = status;
+    renderScreenFromStatus(client, config, $container, status);
+  });
+
+  function renderScreenFromStatus(client, config, $container, status) {
     const { width, height } = $container.getBoundingClientRect();
 
     // for testing...
@@ -211,9 +219,17 @@ export default function renderInitializationScreens(client, config, $container) 
     }
 
     render($screen, $container);
+  }
+  // clean when ready...
+  client.pluginManager.ready.then(() => {
+    window.removeEventListener('resize', onResize);
+    unsubscribe();
   });
 
-  // clean when ready...
-  client.pluginManager.ready.then(unsubscribe);
+  const onResize = () => {
+    renderScreenFromStatus(client, config, $container, currentStatus);
+  };
+
+  window.addEventListener('resize', onResize);
 }
 
