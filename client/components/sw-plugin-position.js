@@ -31,11 +31,12 @@ class SwSPluginPosition extends LitElement {
     return css`
       :host {
         display: block;
+        position: relative;
       }
 
       .command-container {
         box-sizing: border-box;
-        position: relative;
+        position: absolute;
         padding: 20px;
       }
 
@@ -62,6 +63,7 @@ class SwSPluginPosition extends LitElement {
 
     this.x = null;
     this.y = null;
+    this.backgroundImage = '';
   }
 
   render() {
@@ -111,7 +113,6 @@ class SwSPluginPosition extends LitElement {
         style="
           width: ${commandContainerWidth}px;
           height: ${commandContainerHeight}px;
-          position: absolute;
           top: ${commandContainerTop}px;
           left: ${commandContainerLeft}px;
         "
