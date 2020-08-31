@@ -163,9 +163,21 @@ const renderScreen = {
  */
 export default function renderInitializationScreens(client, config, $container) {
   let currentStatus;
+  let listenResize = false;
+
+  const onResize = () => {
+    renderScreenFromStatus(client, config, $container, currentStatus);
+  };
 
   const unsubscribe = client.pluginManager.observe(status => {
     currentStatus = status;
+
+    // wait for first status before adding resize listener
+    if (!listenResize) {
+      window.addEventListener('resize', onResize);
+      listenResize = true;
+    }
+
     renderScreenFromStatus(client, config, $container, status);
   });
 
@@ -225,11 +237,5 @@ export default function renderInitializationScreens(client, config, $container) 
     window.removeEventListener('resize', onResize);
     unsubscribe();
   });
-
-  const onResize = () => {
-    renderScreenFromStatus(client, config, $container, currentStatus);
-  };
-
-  window.addEventListener('resize', onResize);
 }
 
