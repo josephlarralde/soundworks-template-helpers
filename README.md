@@ -1,6 +1,10 @@
 # `soundworks-template-helpers`
 
-> Set of common helpers for applications based on the [`soundworks-template`](https://github.com/collective-soundworks/soundworks-template)
+> Set of common helpers for applications based on the [`soundworks-template`](https://github.com/collective-soundworks/soundworks-template). 
+>
+> Helpers are already installed in the `soundworks-template
+
+## Installation
 
 ## `renderInitializationScreens`
 
@@ -31,8 +35,8 @@ class ControllerExperience extends Experience {
 
 Initialize generic quality of service strategies.
 
-For now, reload application when socket close or on visibility change.
-__These strategies will be refined / completed over time.__
+For now, basically reload application when socket close or on visibility change.
+__more refined strategies should be created over time.__
 
 ### Usage
 

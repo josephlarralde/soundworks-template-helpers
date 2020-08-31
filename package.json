@@ -1,7 +1,7 @@
 {
   "name": "@soundworks/template-helpers",
   "version": "1.0.0",
-  "description": "Set of common helpers for applications based on the soundworks-template",
+  "description": "set of generic helpers for the soundworks-template",
   "authors": [
     "Benjamin Matuszewski"
   ],
