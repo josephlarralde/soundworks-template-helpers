@@ -1,10 +1,14 @@
-# `soundworks-template-helpers`
+# `@soundworks/template-helpers`
 
 > Set of common helpers for applications based on the [`soundworks-template`](https://github.com/collective-soundworks/soundworks-template). 
 >
 > Helpers are already installed in the `soundworks-template
 
 ## Installation
+
+```
+npm install --save @soundworks/template-helpers
+```
 
 ## `renderInitializationScreens`
 
