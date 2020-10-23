@@ -94,14 +94,16 @@ const renderScreen = {
       msg = 'Finalizing...'
     }
 
+    // @touchend="${ifDefined(bindListener)}"
+    // @mouseup="${ifDefined(bindListener)}"
+
     return html`
       <sw-plugin-platform
         title="${config.app.name}"
         subtitle="${config.app.author}"
         msg="${msg}"
         ?blink="${blink}"
-        @touchend="${ifDefined(bindListener)}"
-        @mouseup="${ifDefined(bindListener)}"
+        @click="${ifDefined(bindListener)}"
       />
     `;
   },
