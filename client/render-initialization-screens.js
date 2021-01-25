@@ -1,6 +1,7 @@
 import { html, render } from 'lit-html';
 import { ifDefined } from 'lit-html/directives/if-defined';
 import './components/sw-app-header.js';
+import './components/sw-plugin-auth.js';
 import './components/sw-plugin-position.js';
 import './components/sw-plugin-platform.js';
 import './components/sw-plugin-default.js';
@@ -69,6 +70,20 @@ const errorMsg = {
 };
 
 const renderScreen = {
+  auth(auth, config, containerInfos) {
+    const sendPassword = (e) => {
+      auth.sendPassword(e.detail);
+    };
+
+    return html`
+      <sw-plugin-auth
+        title="${config.app.name}"
+        subtitle="${config.app.author}"
+        @send="${sendPassword}"
+      />
+    `;
+  },
+
   platform(platform, config, containerInfos) {
     const pluginState = platform.state.getValues();
 
@@ -208,6 +223,11 @@ export default function renderInitializationScreens(client, config, $container) 
 
       const positionService = client.pluginManager.get('position');
       $screen = renderScreen.position(positionService, config, { width, height });
+
+    } else if (status['auth'] && status['auth'] === 'started') {
+
+      const authService = client.pluginManager.get('auth');
+      $screen = renderScreen.auth(authService, config, { width, height });
 
     } else {
       // platform is ready, or not platform at all...
